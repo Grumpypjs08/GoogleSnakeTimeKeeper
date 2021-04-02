@@ -1,23 +1,25 @@
 window.snake.timeKeeper = function(){
 	const scripts = document.getElementsByTagName("script");
-	let url;
-	if(/.*google.*fbx\?fbx=snake_arcade/.test(window.location.href)) {/*If on fbx website*/
-		url = scripts[scripts.length - 1].src; /*Source code belongs to the bottom script tag*/
+	let url = "";
+	/*find the script*/
+	for(let script of scripts){
+		if(script.src != "" && script.src.indexOf('apis.google.com')==-1){
+			// xhr to get source code
+			try{
+				const req = new XMLHttpRequest();
+				req.open("GET", script.src);
+				req.onload = function() {
+					/*check if this is the snake script*/
+					if(this.responseText.indexOf('trophy') != -1){
+						processSnakeCode(this.responseText);
+					}
+				};
+				req.send();
+			}
+			catch{}
+		}
 	}
-	else if(/.*google.*/.test(window.location.href)) {/*If on google search*/
-	    url = scripts[scripts.length - 3].src;/* Source code belongs to fourth from bottom script tag*/
-	} 
-	else{
-		alert("Wrong Website!");
-	}
-
-	// xhr to get source code
-	const req = new XMLHttpRequest();
-	req.open("GET", url);
-	req.onload = function() {
-		processSnakeCode(this.responseText);
-	};
-	req.send();
+	return;
 
 	function processSnakeCode(code){
 		let mode = code.match(/case "trophy":a.[a-zA-Z0-9]{1,4}=/)[0];
@@ -30,7 +32,7 @@ window.snake.timeKeeper = function(){
 		size = size.substring(size.indexOf("a.")+2,size.indexOf("="));
 
 		//function to save pbs to localStorage
-		saveTime = function(time,score,mode,count,speed,size){
+		window.snake.saveTime = function(time,score,mode,count,speed,size){
 			time = Math.floor(time);
 			let pbs = localStorage.getItem("snake_pbs");
 			if(pbs == null){
@@ -55,8 +57,8 @@ window.snake.timeKeeper = function(){
 		let r = func.match(/\(a.[a-zA-Z0-9]{1,4}\*a.[a-zA-Z0-9]{1,4}\)/g)[0];
 		let score = func.match(/25!==[^\\]*?&/)[0].replace("25!==","").replace("&","");
 		func = func.replace(r+")", "temporary");
-		func = func.replace(r+")", r+")"+",saveTime("+r+",\"ALL\",a."+mode+",a."+count+",a."+speed+",a."+size+")")
-		func = func.replace("temporary",r+")"+",saveTime("+r+","+score+",a."+mode+",a."+count+",a."+speed+",a."+size+")");
+		func = func.replace(r+")", r+")"+",window.snake.saveTime("+r+",\"ALL\",a."+mode+",a."+count+",a."+speed+",a."+size+")")
+		func = func.replace("temporary",r+")"+",window.snake.saveTime("+r+","+score+",a."+mode+",a."+count+",a."+speed+",a."+size+")");
 		eval(func);
 
 		//add eventhandler to click on time
