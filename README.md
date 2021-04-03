@@ -9,11 +9,11 @@ Copy and paste the following into the console
 ```
 window.snake.saveTime(time,score,mode,count,speed,size);
 ```
-Change *time* to the time in milliseconds
-Change *score* to 25, 50, 100 or 'ALL'
-Change *mode* to the index of the gamemode in the menu, where 0 = Classic, 1 = Wall, etc...
-Change *count* to the index of the count in the menu, where 0 = 1 Apple, 1 = 3 Apples, etc...
-Change *speed* and *size* in the same way.
+* Change *time* to the time in milliseconds
+* Change *score* to 25, 50, 100 or 'ALL'
+* Change *mode* to the index of the gamemode in the menu, where 0 = Classic, 1 = Wall, etc...
+* Change *count* to the index of the count in the menu, where 0 = 1 Apple, 1 = 3 Apples, etc...
+* Change *speed* and *size* in the same way.
 ### Example
 ```
 window.snake.saveTime(130456,50,5,2,1,1);
@@ -23,5 +23,12 @@ Changes the 50 Apple pbs on Twin 5 Apples Fast Small to 02:10:456
 ```
 localStorage.removeItem('snake_pbs');
 ```
-
+## Export/backup pbs
+Run this and save the response somewhere.
+```
+localStorage.getItem('snake_pbs');
+```
+## Restore pbs
+```
+localStorage.setItem('snake_pbs', 'your_PBS_string');
 

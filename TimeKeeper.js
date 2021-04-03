@@ -42,12 +42,44 @@ window.snake.timeKeeper = function(){
 				pbs = JSON.parse(pbs);
 			}
 			let name = score.toString()+"-"+mode+"-"+count+"-"+speed+"-"+size;
-			if(typeof(pbs[name]) == "undefined" || time < pbs[name].time){
+
+			if(typeof(pbs[name]) == "undefined"){
 				console.log("NEW PB:");
-				pbs[name] = {"time":time,"date":new Date()};
+				pbs[name] = {"time":time,"date":new Date(),"att":1,"sum":time};
+			}
+			else{
+				//increase attempt
+				if(typeof(pbs[name].att) == "undefined"){pbs[name].att = 0};
+				pbs[name].att+=1;
+				//increase sum
+				if(typeof(pbs[name].sum) == "undefined"){pbs[name].sum = 0};
+				pbs[name].sum+=time;
+				if(time < pbs[name].time){
+					console.log("NEW PB:");	
+					pbs[name] = {"time":time,"date":new Date(),"att":pbs[name].att,"sum":pbs[name].sum};					
+				}
 			}
 			localStorage.setItem("snake_pbs",JSON.stringify(pbs));
 			console.log(time,score,mode,count,speed,size);
+		}
+
+		//function to add attempt to localStorage
+		window.snake.addAttempt = function(mode, count, speed, size){
+			let pbs = localStorage.getItem("snake_pbs");
+			if(pbs == null){
+				pbs = {};
+			}
+			else{
+				pbs = JSON.parse(pbs);
+			}
+			let name = "att"+"-"+mode+"-"+count+"-"+speed+"-"+size;
+			if(typeof(pbs[name]) == "undefined"){
+				pbs[name] = 1;
+			}
+			else{
+				pbs[name]+=1;
+			}
+			localStorage.setItem("snake_pbs",JSON.stringify(pbs));
 		}
 
 
@@ -56,9 +88,10 @@ window.snake.timeKeeper = function(){
 		func = func.substring(0,func.lastIndexOf(","));
 		let r = func.match(/\(a.[a-zA-Z0-9]{1,4}\*a.[a-zA-Z0-9]{1,4}\)/g)[0];
 		let score = func.match(/25!==[^\\]*?&/)[0].replace("25!==","").replace("&","");
-		func = func.replace(r+")", "temporary");
+		func = func.replace(r+"));", "temporary");
 		func = func.replace(r+")", r+")"+",window.snake.saveTime("+r+",\"ALL\",a."+mode+",a."+count+",a."+speed+",a."+size+")")
-		func = func.replace("temporary",r+")"+",window.snake.saveTime("+r+","+score+",a."+mode+",a."+count+",a."+speed+",a."+size+")");
+		func = func.replace("temporary",r+")"+",window.snake.saveTime("+r+","+score+",a."+mode+",a."+count+",a."+speed+",a."+size+"));"+
+											score+"!==1||window.snake.addAttempt(a."+mode+",a."+count+",a."+speed+",a."+size+");");
 		eval(func);
 
 		//add eventhandler to click on time
@@ -99,7 +132,14 @@ window.snake.timeKeeper = function(){
 			else{
 				pbs = JSON.parse(pbs);
 			}
-			let message = "Your pbs are:\n"
+			let message = "";
+			//add attempts to mesaage
+			let name = "att"+"-"+mode+"-"+count+"-"+speed+"-"+size;
+			if(typeof(pbs[name]) != "undefined"){
+				message+= "Total attempts for this mode: " + pbs[name] + "\n\n";
+			}
+
+			//add pbs to message
 			for(let score of ["25","50","100","ALL"]){
 				let name = score+"-"+mode+"-"+count+"-"+speed+"-"+size;
 				if(typeof(pbs[name]) != "undefined"){
@@ -109,7 +149,18 @@ window.snake.timeKeeper = function(){
 					if(minutes.toString().length < 2){minutes = "0"+minutes.toString()}
 					if(seconds.toString().length < 2){seconds = "0"+seconds.toString()}
 					while(mseconds.toString().length < 3){mseconds = "0"+mseconds.toString()}
-					message+=score+": "+minutes+":"+seconds+":"+mseconds+" "+new Date(pbs[name].date).toString()+"\n";
+					message+=score+":\nBest Time: "+minutes+":"+seconds+":"+mseconds+"\n"+new Date(pbs[name].date).toString();
+					if(pbs[name].att != undefined && pbs[name].sum != undefined){
+						let time = Math.floor(pbs[name].sum/pbs[name].att);
+						minutes = Math.floor(time/60000);
+						seconds = Math.floor((time-minutes*60000)/1000);
+						mseconds = time-minutes*60000-seconds*1000;
+						if(minutes.toString().length < 2){minutes = "0"+minutes.toString()}
+						if(seconds.toString().length < 2){seconds = "0"+seconds.toString()}
+						while(mseconds.toString().length < 3){mseconds = "0"+mseconds.toString()}
+						message+="\nAttempts to this point: "+pbs[name].att+"\nAverage: "+minutes+":"+seconds+":"+mseconds;
+					}
+					message+="\n\n";
 				}
 			}
 			alert(message);
