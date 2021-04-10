@@ -22,13 +22,13 @@ window.snake.timeKeeper = function(){
 	return;
 
 	function processSnakeCode(code){
-		let mode = code.match(/case "trophy":a.[a-zA-Z0-9]{1,4}=/)[0];
+		let mode = code.match(/case "trophy":a.[a-zA-Z0-9$]{1,4}=/)[0];
 		mode = mode.substring(mode.indexOf("a.")+2,mode.indexOf("="));
-		let count = code.match(/case "count":a.[a-zA-Z0-9]{1,4}=/)[0];
+		let count = code.match(/case "count":a.[a-zA-Z0-9$]{1,4}=/)[0];
 		count = count.substring(count.indexOf("a.")+2,count.indexOf("="));
-		let speed = code.match(/case "speed":a.[a-zA-Z0-9]{1,4}=/)[0];
+		let speed = code.match(/case "speed":a.[a-zA-Z0-9$]{1,4}=/)[0];
 		speed = speed.substring(speed.indexOf("a.")+2,speed.indexOf("="));
-		let size = code.match(/case "size":a.[a-zA-Z0-9]{1,4}=/)[0];
+		let size = code.match(/case "size":a.[a-zA-Z0-9$]{1,4}=/)[0];
 		size = size.substring(size.indexOf("a.")+2,size.indexOf("="));
 
 		//function to save pbs to localStorage
