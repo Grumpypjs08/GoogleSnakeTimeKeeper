@@ -84,9 +84,9 @@ window.snake.timeKeeper = function(){
 
 
 		//change function to save times
-		let func = code.match(/[a-zA-Z0-9_]{1,6}=function\(a\)[^\\]{0,4000}\(a.[a-zA-Z0-9]{1,4}\*a.[a-zA-Z0-9]{1,4}\)\)[^\\]*?function/g)[0];
+		let func = code.match(/[a-zA-Z0-9_$]{1,6}=function\(a\)[^\\]{0,4000}\(a.[a-zA-Z0-9$]{1,4}\*a.[a-zA-Z0-9$]{1,4}\)\)[^\\]*?function/g)[0];
 		func = func.substring(0,func.lastIndexOf(","));
-		let r = func.match(/\(a.[a-zA-Z0-9]{1,4}\*a.[a-zA-Z0-9]{1,4}\)/g)[0];
+		let r = func.match(/\(a.[a-zA-Z0-9$]{1,4}\*a.[a-zA-Z0-9$]{1,4}\)/g)[0];
 		let score = func.match(/25!==[^\\]*?&/)[0].replace("25!==","").replace("&","");
 		func = func.replace(r+"));", "temporary");
 		func = func.replace(r+")", r+")"+",window.snake.saveTime("+r+",\"ALL\",a."+mode+",a."+count+",a."+speed+",a."+size+")")
@@ -95,7 +95,7 @@ window.snake.timeKeeper = function(){
 		eval(func);
 
 		//add eventhandler to click on time
-		let id = func.match(/[^"]*?"[^"]*?\(a.[a-zA-Z0-9]{1,4}\*a.[a-zA-Z0-9]{1,4}\)/g)[0];
+		let id = func.match(/[^"]*?"[^"]*?\(a.[a-zA-Z0-9$]{1,4}\*a.[a-zA-Z0-9$]{1,4}\)/g)[0];
 		id = id.substring(0, id.indexOf("\""));
 		document.querySelector("div[jsname^=\""+id+"\"]").parentElement.parentElement.addEventListener("click",(e)=>{
 			let getSelectedIndex = function(name){
