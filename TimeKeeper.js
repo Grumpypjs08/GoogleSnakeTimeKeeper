@@ -451,7 +451,8 @@ window.snake.timeKeeper.showDialog = function(){
 	dialog.appendChild(buttonExport);
 
 	//add dialog
-	div = document.querySelector("canvas").parentElement;
+	div = document.querySelector("body");
+	dialog.setAttribute("style","z-index:9999;top:-50px;right:-50px;bottom:-50px;left:-50px;");
 	div.insertBefore(dialog, div.firstChild)};
 
 function processSnakeCode(code){
