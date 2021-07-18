@@ -11,6 +11,7 @@
 window.snake.timeKeeper = {};
 //called on every apple
 window.snake.timeKeeper.gotApple = function(time, score){
+	//console.log("got Apple %s, %s", time, score);
 	window.snake.timeKeeper.lastAppleDate = new Date();
 	window.snake.timeKeeper.lastAppleTime = time;
 	//save time
@@ -21,11 +22,13 @@ window.snake.timeKeeper.gotApple = function(time, score){
 
 //called when you get all apples
 window.snake.timeKeeper.gotAll = function(time, score){
+	//console.log("got All %s, %s", time, score);
 	window.snake.timeKeeper.savePB(time, "ALL", window.snake.timeKeeper.mode, window.snake.timeKeeper.count, window.snake.timeKeeper.speed, window.snake.timeKeeper.size);
 }
 
 //called when you're dead, every time.
 window.snake.timeKeeper.death = function(time, score){
+	//console.log("death %s, %s", time, score);
 	if(window.snake.timeKeeper.playing){
 		window.snake.timeKeeper.playing = false;
 		window.snake.timeKeeper.saveScore(time, score, window.snake.timeKeeper.mode, window.snake.timeKeeper.count, window.snake.timeKeeper.speed, window.snake.timeKeeper.size);
@@ -34,6 +37,7 @@ window.snake.timeKeeper.death = function(time, score){
 
 //called when you start gamed d
 window.snake.timeKeeper.start = function(){
+	//console.log("start");
 	window.snake.timeKeeper.playing = true;
 	//save current settings
 	window.snake.timeKeeper.mode = window.snake.timeKeeper.getCurrentMode();
@@ -457,20 +461,20 @@ window.snake.timeKeeper.showDialog = function(){
 
 function processSnakeCode(code){
 	//change stepfunction to run gotApple(), gotAll() and death()
-	let func = code.match(/[a-zA-Z0-9_$]{1,6}=function\(a\)[^\\]{1,700}RIGHT":0[^\\]*?=function/)[0];
-	func = func.substring(0,func.lastIndexOf(","));
+	let func = code.match(/[a-zA-Z0-9_$.]{1,40}=function\(\)[^\\]{1,700}RIGHT":0[^\\]*?=function/)[0];
+	func = func.substring(0,func.lastIndexOf(";"));
 	let modeFunc = func.match(/!1}\);[^%]{0,10}/)[0];
 	modeFunc = modeFunc.substring(modeFunc.indexOf("(")+1,modeFunc.lastIndexOf("("));
-	scoreFunc = func.match(/25\!\=\=a.[a-zA-Z0-9$]{1,4}/)[0];
-	scoreFunc = scoreFunc.substring(scoreFunc.indexOf("a."),scoreFunc.size);
-	timeFunc = func.match(/a.[a-zA-Z0-9$]{1,4}\*a.[a-zA-Z0-9$]{1,4}/)[0];
+	scoreFunc = func.match(/25\!\=\=this.[a-zA-Z0-9$]{1,4}/)[0];
+	scoreFunc = scoreFunc.substring(scoreFunc.indexOf("this."),scoreFunc.size);
+	timeFunc = func.match(/this.[a-zA-Z0-9$]{1,6}\*this.[a-zA-Z0-9$]{1,6}/)[0];
 	ownFuncIndex = func.indexOf(func.match(/!1}\);[^%]{0,10}/)[0])+5;
 	ownFunc = "window.snake.timeKeeper.gotApple(Math.floor("+timeFunc+"),"+scoreFunc+");"
 	func = func.slice(0, ownFuncIndex) + ownFunc + func.slice(ownFuncIndex);
 	//change all apples to run gotAll()
 	func = func.slice(0,func.indexOf("WIN.play()")+11)+"window.snake.timeKeeper.gotAll(Math.floor("+timeFunc+"),"+scoreFunc+"),"+func.slice(func.indexOf("WIN.play()")+11);
 
-	death = func.match(/if\(a.[a-zA-Z0-9$]{1,4}\|\|a.[a-zA-Z0-9$]{1,4}\)/)[0];
+	death = func.match(/if\(this.[a-zA-Z0-9$]{1,4}\|\|this.[a-zA-Z0-9$]{1,4}\)/)[0];
 	death = death.slice(death.indexOf("(")+1,death.indexOf("|"));
 	func = func.slice(0,func.indexOf("{")+1) + "if("+death+"){window.snake.timeKeeper.death(Math.floor("+timeFunc+"),"+scoreFunc+");}" + func.slice(func.indexOf("{")+1)
 	eval(func)
@@ -479,6 +483,7 @@ function processSnakeCode(code){
 	func = code.match(/[a-zA-Z0-9_$]{1,6}=function\(a,b\){if\(!\(a.[a-zA-Z0-9$]{1,4}[^\\]*?=function/)[0];
 	func = func.substring(0, func.lastIndexOf(","));
 	step = timeFunc.substring(0,timeFunc.indexOf("*"));
+	step = "a"+step.slice(step.indexOf("."));
 	
 	func = func.slice(0,func.indexOf("{")+1)+"if("+step+"==0){window.snake.timeKeeper.start();}"+func.slice(func.indexOf("{")+1);
 	eval(func)
