@@ -1,4 +1,4 @@
-# TimeKeeper for Google Snak
+# TimeKeeper for Google Snake
 This mod for Google Snake keeps track of your fastest times and highscores for every mode. To see your personal bests on the current settings, just click on the timer.
 ## Enable Timekeeper (option 1)
 Go to releases and download TimeKeeper.html. Go to your browser and import this file as a new bookmark. Simply press the bookmark to enable the mod.
